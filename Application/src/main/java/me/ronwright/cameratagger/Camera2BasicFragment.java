@@ -75,6 +75,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -997,9 +999,14 @@ public class Camera2BasicFragment extends Fragment
                     // Display the list of tags in the UI.
                     StringBuilder b = new StringBuilder();
                     for (Tag tag : result.getTags()) {
-                        b.append(b.length() > 0 ? ", " : "").append(
-                                "<a href=\"http://www.google.com/search?q="
-                                        + tag.getName() + "\">" + tag.getName() + "</a>");
+                        try {
+                            b.append(b.length() > 0 ? ", " : "").append(
+                                    "<a href=\"http://www.google.com/search?q="
+                                            + URLEncoder.encode(tag.getName(), "utf-8")
+                                            + "\">" + tag.getName() + "</a>");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
                     }
                     mTextView.setMovementMethod(LinkMovementMethod.getInstance());
                     mTextView.setText(Html.fromHtml("Tags:<br/>" + b));
