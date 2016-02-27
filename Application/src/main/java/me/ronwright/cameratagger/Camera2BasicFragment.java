@@ -52,6 +52,8 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v13.app.FragmentCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -995,9 +997,12 @@ public class Camera2BasicFragment extends Fragment
                     // Display the list of tags in the UI.
                     StringBuilder b = new StringBuilder();
                     for (Tag tag : result.getTags()) {
-                        b.append(b.length() > 0 ? ", " : "").append(tag.getName());
+                        b.append(b.length() > 0 ? ", " : "").append(
+                                "<a href=\"http://www.google.com/search?q="
+                                        + tag.getName() + "\">" + tag.getName() + "</a>");
                     }
-                    mTextView.setText("Tags:\n" + b);
+                    mTextView.setMovementMethod(LinkMovementMethod.getInstance());
+                    mTextView.setText(Html.fromHtml("Tags:<br/>" + b));
                 } else {
                     Log.e(TAG, "Clarifai: " + result.getStatusMessage());
                     mTextView.setText("Sorry, there was an error recognizing your image.");
