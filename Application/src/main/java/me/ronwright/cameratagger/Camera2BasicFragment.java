@@ -450,6 +450,7 @@ public class Camera2BasicFragment extends Fragment
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         view.findViewById(me.ronwright.cameratagger.R.id.picture).setOnClickListener(this);
         view.findViewById(me.ronwright.cameratagger.R.id.info).setOnClickListener(this);
+        view.findViewById(me.ronwright.cameratagger.R.id.live).setOnClickListener(this);
         mTextureView = (AutoFitTextureView) view.findViewById(me.ronwright.cameratagger.R.id.texture);
         mTextView = (TextView) view.findViewById(me.ronwright.cameratagger.R.id.textView);
     }
@@ -899,6 +900,18 @@ public class Camera2BasicFragment extends Fragment
                 takePicture();
                 break;
             }
+            
+            case R.id.live: {
+                for( int z = 0; z < 10; z++) {
+                    timer.scheduleAtFixedRate(new TimerTask() {
+                        @Override
+                        public void run() {
+                            takePicture();
+                        }
+                    }, 0, 1000);
+                }
+            }
+            
             case me.ronwright.cameratagger.R.id.info: {
                 Activity activity = getActivity();
                 if (null != activity) {
