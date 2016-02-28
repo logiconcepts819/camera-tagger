@@ -19,11 +19,14 @@ package me.ronwright.cameratagger;
 import android.app.Activity;
 import android.os.Bundle;
 
+import com.firebase.client.Firebase;
+
 public class CameraActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Firebase.setAndroidContext(this);
         setContentView(me.ronwright.cameratagger.R.layout.activity_camera);
         if (null == savedInstanceState) {
             getFragmentManager().beginTransaction()

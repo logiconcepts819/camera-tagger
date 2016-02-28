@@ -70,6 +70,12 @@ import com.clarifai.api.RecognitionRequest;
 import com.clarifai.api.RecognitionResult;
 import com.clarifai.api.Tag;
 import com.clarifai.api.exception.ClarifaiException;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.MutableData;
+import com.firebase.client.Transaction;
+import com.firebase.client.ValueEventListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -82,6 +88,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -992,6 +999,30 @@ public class Camera2BasicFragment extends Fragment
             }
         }
 
+        public void incrementCounter(Firebase firebase) {
+            firebase.runTransaction(new Transaction.Handler() {
+                @Override
+                public Transaction.Result doTransaction(final MutableData currentData) {
+                    if (currentData.getValue() == null) {
+                        currentData.setValue(1);
+                    } else {
+                        currentData.setValue((Long) currentData.getValue() + 1);
+                    }
+
+                    return Transaction.success(currentData);
+                }
+
+                @Override
+                public void onComplete(FirebaseError firebaseError, boolean committed, DataSnapshot currentData) {
+                    if (firebaseError != null) {
+                        Log.d(TAG, "Firebase counter increment failed.");
+                    } else {
+                        Log.d(TAG, "Firebase counter increment succeeded.");
+                    }
+                }
+            });
+        }
+
         /** Updates the UI by displaying tags for the given result. */
         private void updateUIForResult(RecognitionResult result) {
             if (result != null) {
@@ -1000,10 +1031,12 @@ public class Camera2BasicFragment extends Fragment
                     StringBuilder b = new StringBuilder();
                     for (Tag tag : result.getTags()) {
                         try {
+                            String encodedTag = URLEncoder.encode(tag.getName(), "utf-8");
+                            Firebase fbRef = new Firebase("http://intense-fire-1654.firebaseio.com/histogram/" + encodedTag);
+                            incrementCounter(fbRef);
                             b.append(b.length() > 0 ? ", " : "").append(
                                     "<a href=\"http://www.google.com/search?q="
-                                            + URLEncoder.encode(tag.getName(), "utf-8")
-                                            + "\">" + tag.getName() + "</a>");
+                                            + encodedTag + "\">" + tag.getName() + "</a>");
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
                         }
